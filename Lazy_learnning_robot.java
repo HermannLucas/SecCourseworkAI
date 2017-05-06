@@ -17,7 +17,7 @@ public class Lazy_learnning_robot extends AdvancedRobot
 	public int rounds = 0;
 	public final int exRounds = 100;
 	public final double alpha = 0.1;
-	public int[][] qMatrix = new int[8*8*8*8*8][3];
+	public int[][] qMatrix = new int[8*8*8*8*8*8*8][3];
 	public ArrayList<Integer> statesArray = new ArrayList<Integer>();
 	public int reward = 0;
 	public Random random = new Random();
@@ -292,6 +292,12 @@ public class Lazy_learnning_robot extends AdvancedRobot
 		}
 	}
 	
+	public void doMove(int x, ScannedRobotEvent e) {
+		switch(x) {
+			case 1:
+		}
+	}
+	
 	// Method producing a unique int representing our current state
 	// Data used : Enemy location (x,y), enemy velocity, my gun bearing, the distance to the ennemy
 	public int makeState (ScannedRobotEvent e) {
@@ -312,6 +318,8 @@ public class Lazy_learnning_robot extends AdvancedRobot
 		state += simplify_vel(e.getVelocity()) * 100;
 		state += simplify_bear(e.getBearing()) * 1000;
 		state += simplify_dist(e.getDistance()) * 10000;
+		state += simplify_loc(getX()) * 100000;
+		state += simplify_loc(getY()) * 1000000;
 		
 		return state;
 	}
