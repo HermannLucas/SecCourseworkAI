@@ -259,7 +259,9 @@ public class Lazy_learnning_robot extends AdvancedRobot
 		switch(x) {
 			case 0:
 				// Align the gun to the opponnent position
+				bulletPower = 1;
 				setTurnGunRight(getHeading() - getGunHeading() + e.getBearing());
+				setFire(bulletPower);
 				break;
 			case 1:
 				/*
