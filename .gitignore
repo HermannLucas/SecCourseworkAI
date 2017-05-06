@@ -17,6 +17,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Text file
+*.txt
+
 # =========================
 # Operating System Files
 # =========================
@@ -45,3 +48,4 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+Lazy_learnning_robot.data/LookUpTable.txt
