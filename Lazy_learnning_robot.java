@@ -1,5 +1,6 @@
 package SecCourseworkAI;
 import robocode.*;
+import robocode.util.Utils;
 import java.util.Random;
 import java.util.ArrayList;
 //import java.util.ListIterator;
@@ -7,18 +8,20 @@ import java.io.PrintStream;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.lang.Math;
 
 public class Lazy_learnning_robot extends AdvancedRobot
 {
 	public boolean explore = true;
 	public boolean greedy = false;
 	public int rounds = 0;
-	public final int exRounds = 250;
+	public final int exRounds = 100;
 	public final double alpha = 0.1;
 	public int[][] qMatrix = new int[8*8*8*8*8][3];
 	public ArrayList<Integer> statesArray = new ArrayList<Integer>();
 	public int reward = 0;
 	public Random random = new Random();
+	public double bulletPower;
 	
 	public void run() {
 	// Used to intanciate the Look up table but to demanding in ressources to be used in robocode
@@ -73,7 +76,6 @@ public class Lazy_learnning_robot extends AdvancedRobot
 			// Perform a random action	
 			int action = random.nextInt(3);
 			doAction(action, e);
-			Bullet bullet = fireBullet(0.1);
 			
 			// Collects the reward and add it to the appropriate cell
 			qMatrix[statesArray.indexOf(state)][action] += reward;
@@ -112,7 +114,6 @@ public class Lazy_learnning_robot extends AdvancedRobot
 			
 			// Perform the action and update the reward values
 			doAction(nextAction, e);
-			Bullet bullet = fireBullet(3);
 			qMatrix[statesArray.indexOf(state)][nextAction] += reward;
 		}
 	}
@@ -261,12 +262,30 @@ public class Lazy_learnning_robot extends AdvancedRobot
 				setTurnGunRight(getHeading() - getGunHeading() + e.getBearing());
 				break;
 			case 1:
-				// Align the gun to the opponnent position + 10 degrees
-				setTurnGunRight(getHeading() - getGunHeading() + e.getBearing() + 10);
+				/*
+				| From Robocode : RandomTargeting
+				| http://robowiki.net/wiki/RandomTargeting
+				*/
+				double targetAngle = getHeadingRadians() + e.getBearingRadians();
+
+				bulletPower = Math.max(0.1,Math.random() * 3.0);
+				double escapeAngle = Math.asin(8 / Rules.getBulletSpeed(bulletPower));
+				double randomAimOffset = -escapeAngle + Math.random() * 2 * escapeAngle;
+
+				double headOnTargeting = targetAngle - getGunHeadingRadians();
+				setTurnGunRightRadians(Utils.normalRelativeAngle(headOnTargeting + randomAimOffset));
+				setFire(bulletPower);
 				break;
 			case 2:
-				// Align the gun to the opponnent position - 10 degrees
-				setTurnGunRight(getHeading() - getGunHeading() + e.getBearing() - 10);
+				/*
+				| From Robocode : Linear targeting
+				| http://robowiki.net/wiki/Linear_Targeting
+				*/
+				bulletPower = 3;
+    			double headOnBearing = getHeadingRadians() + e.getBearingRadians();
+    			double linearBearing = headOnBearing + Math.asin(e.getVelocity() / Rules.getBulletSpeed(bulletPower) * Math.sin(e.getHeadingRadians() - headOnBearing));
+    			setTurnGunRightRadians(Utils.normalRelativeAngle(linearBearing - getGunHeadingRadians()));
+    			setFire(bulletPower);
 				break;
 		}
 	}
